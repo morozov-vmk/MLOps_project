@@ -41,6 +41,7 @@ class TestUtils:
 
     def test_set_seed(self):
         """Test setting random seed."""
+
         set_seed(42)
 
         import random
