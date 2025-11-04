@@ -116,6 +116,9 @@ python train.py
 python train.py --config config/custom_config.yaml
 ```
 
+### ВАЖНО!
+Датасеты лежат по [ссылке](https://drive.google.com/drive/folders/1-NeQRUze3xzTSZndjm6rIWCsgXnxtPGI), их нужно скачать и положить в директорию `datasets`
+
 ### Конфигурация
 
 Основные параметры в `config/model_config.yaml`
