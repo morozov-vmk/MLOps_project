@@ -1,0 +1,29 @@
+# Model Architecture
+model:
+  input_dim: 370
+  hidden_layers: [512, 256, 128, 64, 32]
+  dropout_rates: [0.4, 0.3, 0.3, 0.2, 0.1]
+  use_batch_norm: true
+  activation: "relu"
+
+# Training
+training:
+  learning_rate: 0.001
+  weight_decay: 0.00001
+  batch_size: 256
+  num_epochs: 14
+  early_stopping_patience: 10
+
+# Data
+data:
+  train_path: "/workdir/data_mlc/datasets/dataset_2025_07_with_segment_vector.parquet"
+  test_path: "/workdir/data_mlc/datasets/dataset_2025_08_with_segment_vector.parquet"
+  target_column: "active_essence"
+  exclude_columns: ["party_rk", "essence_id", "utilized"]
+  validation_size: 0.2
+  random_seed: 42
+
+# Logging
+logging:
+  level: "INFO"
+  log_file: "training.log"
