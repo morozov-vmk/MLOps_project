@@ -74,11 +74,11 @@ jobs:
 
         # Test data loading integration
         processor = DataProcessor(config)
-        print('✅ DataProcessor initialized successfully')
+        print('DataProcessor initialized successfully')
 
         # Test model creation
         model = CashbackMLP(config)
-        print('✅ Model initialized successfully')
+        print('Model initialized successfully')
 
-        print('✅ All integration tests passed!')
+        print('All integration tests passed!')
         "
