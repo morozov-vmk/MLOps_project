@@ -30,7 +30,7 @@ class DataProcessor:
         self.feature_columns = None
 
     def _clean_data(self, df):
-        """Clean data from infinite values, NaNs and extreme values"""
+        """Clean data from infinite values and NaN"""
         logger.info("Cleaning data from infinite and NaN values...")
 
         df_clean = df.copy()
@@ -41,7 +41,7 @@ class DataProcessor:
         nan_count_before = df_clean.isna().sum().sum()
 
         logger.info(
-            f"Found {inf_count_before} inf val and {nan_count_before} NaN values"
+            f"Found {inf_count_before} infinite values and {nan_count_before} NaN values before cleaning"
         )
 
         df_clean = df_clean.replace([np.inf, -np.inf], np.nan)
@@ -49,17 +49,27 @@ class DataProcessor:
         numerical_cols = df_clean.select_dtypes(include=[np.number]).columns
 
         for col in numerical_cols:
-            median_val = df_clean[col].median()
-            df_clean[col] = df_clean[col].fillna(median_val)
+            if df_clean[col].isna().all():
+                df_clean[col] = 0.0
+                continue
 
-            if df_clean[col].dtype in [np.float64, np.float32]:
+            if df_clean[col].isna().any():
+                median_val = df_clean[col].median()
+                if pd.isna(median_val):
+                    df_clean[col] = df_clean[col].fillna(0.0)
+                else:
+                    df_clean[col] = df_clean[col].fillna(median_val)
+
+            if len(df_clean[col]) > 1 and df_clean[col].nunique() > 1:
                 Q1 = df_clean[col].quantile(0.25)
                 Q3 = df_clean[col].quantile(0.75)
                 IQR = Q3 - Q1
-                lower_bound = Q1 - 3 * IQR
-                upper_bound = Q3 + 3 * IQR
 
-                df_clean[col] = np.clip(df_clean[col], lower_bound, upper_bound)
+                if IQR > 0:
+                    lower_bound = Q1 - 10 * IQR
+                    upper_bound = Q3 + 10 * IQR
+
+                    df_clean[col] = np.clip(df_clean[col], lower_bound, upper_bound)
 
         inf_count_after = (
             np.isinf(df_clean.select_dtypes(include=[np.number])).sum().sum()
@@ -67,7 +77,7 @@ class DataProcessor:
         nan_count_after = df_clean.isna().sum().sum()
 
         logger.info(
-            f"After cleaning: {inf_count_after} inf val and {nan_count_after} NaN"
+            f"After cleaning: {inf_count_after} infinite values and {nan_count_after} NaN values"
         )
 
         return df_clean

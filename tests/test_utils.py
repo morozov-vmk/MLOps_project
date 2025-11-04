@@ -1,19 +1,21 @@
-import sys
+"""Tests for utility functions."""
 
-import pytest
-import torch
+import tempfile
+import os
 import yaml
+import torch
+import sys
 
 sys.path.append("src")
 
-from utils import get_device, load_config, set_seed, setup_logging
+from utils import setup_logging, load_config, set_seed, get_device
 
 
 class TestUtils:
-    """Тесты утилитарных функций"""
+    """Test utility functions."""
 
     def test_load_config(self):
-        """Тест загрузки конфигурации"""
+        """Test loading configuration."""
         with tempfile.NamedTemporaryFile(mode="w", suffix=".yaml", delete=False) as f:
             config_data = {
                 "model": {"input_dim": 10},
@@ -24,25 +26,25 @@ class TestUtils:
 
         try:
             config = load_config(temp_config_path)
-
             assert config["model"]["input_dim"] == 10
             assert config["training"]["learning_rate"] == 0.001
         finally:
             os.unlink(temp_config_path)
 
     def test_load_config_file_not_found(self):
-        """Тест загрузки несуществующего конфига"""
-        with pytest.raises(FileNotFoundError):
+        """Test loading non-existent config."""
+        try:
             load_config("nonexistent_config.yaml")
+            assert False, "Should have raised FileNotFoundError"
+        except FileNotFoundError:
+            pass
 
     def test_set_seed(self):
-        """Тест установки random seed"""
+        """Test setting random seed."""
         set_seed(42)
 
         import random
-
         import numpy as np
-        import torch
 
         py_num = random.random()
         np_num = np.random.random()
@@ -58,13 +60,12 @@ class TestUtils:
         assert torch_num == torch_num2
 
     def test_get_device(self):
-        """Тест определения устройства"""
+        """Test device detection."""
         device = get_device()
-
         assert device in [torch.device("cpu"), torch.device("cuda")]
 
     def test_setup_logging(self):
-        """Тест настройки логирования"""
+        """Test logging setup."""
         import logging
 
         config = {"logging": {"level": "INFO", "log_file": "test.log"}}
@@ -74,5 +75,6 @@ class TestUtils:
         logger = logging.getLogger("test")
         logger.info("Test message")
 
+        # Clean up
         if os.path.exists("test.log"):
             os.remove("test.log")

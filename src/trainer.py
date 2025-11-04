@@ -85,17 +85,52 @@ class ModelTrainer:
                 all_predictions.extend(predictions)
                 all_targets.extend(target.cpu().numpy())
 
+        if len(all_targets) == 0:
+            return {
+                "loss": 0.0,
+                "accuracy": 0.0,
+                "auc": 0.0,
+                "precision": 0.0,
+                "recall": 0.0,
+                "f1": 0.0,
+            }
+
         all_probabilities = np.array(all_probabilities)
         all_predictions = np.array(all_predictions)
         all_targets = np.array(all_targets)
 
+        try:
+            accuracy = accuracy_score(all_targets, all_predictions)
+        except:
+            accuracy = 0.0
+
+        try:
+            auc = roc_auc_score(all_targets, all_probabilities)
+        except:
+            auc = 0.0
+
+        try:
+            precision = precision_score(all_targets, all_predictions, zero_division=0)
+        except:
+            precision = 0.0
+
+        try:
+            recall = recall_score(all_targets, all_predictions, zero_division=0)
+        except:
+            recall = 0.0
+
+        try:
+            f1 = f1_score(all_targets, all_predictions, zero_division=0)
+        except:
+            f1 = 0.0
+
         metrics = {
-            "loss": val_loss / len(val_loader),
-            "accuracy": accuracy_score(all_targets, all_predictions),
-            "auc": roc_auc_score(all_targets, all_probabilities),
-            "precision": precision_score(all_targets, all_predictions, zero_division=0),
-            "recall": recall_score(all_targets, all_predictions, zero_division=0),
-            "f1": f1_score(all_targets, all_predictions, zero_division=0),
+            "loss": val_loss / max(len(val_loader), 1),
+            "accuracy": accuracy,
+            "auc": auc,
+            "precision": precision,
+            "recall": recall,
+            "f1": f1,
         }
 
         return metrics

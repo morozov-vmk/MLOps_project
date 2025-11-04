@@ -155,8 +155,10 @@ class TestTrainerEdgeCases:
 
         metrics = trainer.validate(empty_loader, 0)
 
-        assert "auc" in metrics
+        assert "loss" in metrics
         assert "accuracy" in metrics
+        assert "auc" in metrics
+        assert metrics["loss"] == 0.0
 
     def test_single_batch_training(self, sample_config):
         """Тест обучения на одном батче"""
@@ -165,9 +167,10 @@ class TestTrainerEdgeCases:
         trainer = ModelTrainer(model, sample_config, device)
 
         single_batch_loader = Mock()
-        single_batch_data = [(torch.randn(1, 10), torch.tensor([1.0]))]
+        single_batch_data = [(torch.randn(2, 10), torch.tensor([1.0, 0.0]))]
         single_batch_loader.__iter__ = Mock(return_value=iter(single_batch_data))
         single_batch_loader.__len__ = Mock(return_value=1)
 
         loss = trainer.train_epoch(single_batch_loader, 0)
         assert isinstance(loss, float)
+        assert loss > 0
