@@ -25,7 +25,6 @@ class TestCashbackMLP:
     def test_model_initialization(self, sample_config):
         """Тест инициализации модели"""
         model = CashbackMLP(sample_config)
-
         assert model is not None
         assert hasattr(model, "network")
         assert isinstance(model.network, torch.nn.Sequential)
