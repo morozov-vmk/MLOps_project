@@ -16,8 +16,8 @@ training:
 
 # Data
 data:
-  train_path: "/workdir/data_mlc/datasets/dataset_2025_07_with_segment_vector.parquet"
-  test_path: "/workdir/data_mlc/datasets/dataset_2025_08_with_segment_vector.parquet"
+  train_path: "datasets/dataset_2025_07_with_segment_vector.parquet"
+  test_path: "datasets/dataset_2025_08_with_segment_vector.parquet"
   target_column: "active_essence"
   exclude_columns: ["party_rk", "essence_id", "utilized"]
   validation_size: 0.2

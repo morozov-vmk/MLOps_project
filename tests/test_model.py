@@ -35,15 +35,12 @@ class TestCashbackMLP:
         model = CashbackMLP(sample_config)
         batch_size = 32
 
-        # Создаем тестовый вход
         x = torch.randn(batch_size, sample_config["model"]["input_dim"])
 
-        # Прямой проход
         output = model(x)
 
-        # Проверяем выход
         assert output.shape == (batch_size, 1)
-        assert torch.all(output >= 0) and torch.all(output <= 1)  # Sigmoid output
+        assert torch.all(output >= 0) and torch.all(output <= 1)
 
     def test_model_parameters(self, sample_config):
         """Тест наличия обучаемых параметров"""
@@ -52,7 +49,6 @@ class TestCashbackMLP:
         parameters = list(model.parameters())
         assert len(parameters) > 0
 
-        # Проверяем, что параметры требуют градиенты
         for param in parameters:
             assert param.requires_grad
 
@@ -60,8 +56,7 @@ class TestCashbackMLP:
         """Тест работы с разными размерами батчей"""
         model = CashbackMLP(sample_config)
 
-        # Используем размеры батчей которые работают с BatchNorm
-        batch_sizes = [2, 16, 32]  # Минимум 2 для BatchNorm
+        batch_sizes = [2, 16, 32]
 
         for batch_size in batch_sizes:
             x = torch.randn(batch_size, sample_config["model"]["input_dim"])
@@ -73,16 +68,13 @@ class TestCashbackMLP:
         """Тест переключения режимов обучения/инференса"""
         model = CashbackMLP(sample_config)
 
-        # Проверяем, что в режиме обучения dropout активен
         model.train()
         x = torch.randn(16, sample_config["model"]["input_dim"])
         output_train = model(x)
 
-        # Проверяем, что в режиме инференса вывод стабилен
         model.eval()
         output_eval = model(x)
 
-        # Выводы могут немного отличаться из-за dropout
         assert not torch.allclose(output_train, output_eval)
 
     def test_gradient_flow(self, sample_config):
@@ -95,16 +87,12 @@ class TestCashbackMLP:
         )
         y = torch.randint(0, 2, (batch_size, 1)).float()
 
-        # Прямой проход
         output = model(x)
 
-        # Вычисляем loss
         criterion = torch.nn.BCELoss()
         loss = criterion(output, y)
 
-        # Обратное распространение
         loss.backward()
 
-        # Проверяем, что градиенты вычислены
         assert x.grad is not None
         assert x.grad.shape == x.shape
