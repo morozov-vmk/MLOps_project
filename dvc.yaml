@@ -1,6 +1,6 @@
 stages:
   prepare:
-    cmd: python scripts/prepare.py --config config/model_config.yaml --output 
+    cmd: python prepare.py --config config/model_config.yaml --output 
       data/processed/processed_data.npz
     deps:
     - config/model_config.yaml
@@ -10,7 +10,7 @@ stages:
     outs:
     - data/processed/processed_data.npz
   train:
-    cmd: python scripts/train.py --config config/model_config.yaml --processed 
+    cmd: python train.py --config config/model_config.yaml --processed 
       data/processed/processed_data.npz --output-dir artifacts
     deps:
     - config/model_config.yaml
@@ -22,11 +22,8 @@ stages:
     - artifacts/best_model.pth
     - artifacts/model_weights.pth
     - artifacts/used_config.json
-    metrics:
-    - artifacts/train_metrics.json:
-        cache: false
   evaluate:
-    cmd: python scripts/evaluate.py --config config/model_config.yaml 
+    cmd: python evaluate.py --config config/model_config.yaml 
       --processed data/processed/processed_data.npz --model-weights 
       artifacts/model_weights.pth --output-dir artifacts/eval
     deps:
