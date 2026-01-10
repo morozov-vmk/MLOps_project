@@ -11,7 +11,7 @@ training:
   learning_rate: 0.001
   weight_decay: 0.00001
   batch_size: 256
-  num_epochs: 1
+  num_epochs: 2
   early_stopping_patience: 10
 
 # Data

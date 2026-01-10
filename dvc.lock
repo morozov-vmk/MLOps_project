@@ -6,7 +6,7 @@ stages:
     deps:
     - path: config/model_config.yaml
       hash: md5
-      md5: d99bedda07035d3f80e72cbc3033f197
+      md5: 40f8232843d4aeff68df047da5b9fe3c
       size: 653
     - path: datasets
       hash: md5
@@ -32,7 +32,7 @@ stages:
     deps:
     - path: config/model_config.yaml
       hash: md5
-      md5: d99bedda07035d3f80e72cbc3033f197
+      md5: 40f8232843d4aeff68df047da5b9fe3c
       size: 653
     - path: data/processed/processed_data.npz
       hash: md5
@@ -53,15 +53,15 @@ stages:
     outs:
     - path: artifacts/best_model.pth
       hash: md5
-      md5: 4ba015fde5f86a1ff63804310025edb8
+      md5: d56f6cfb91891eda722558757056dfc1
       size: 4452739
     - path: artifacts/model_weights.pth
       hash: md5
-      md5: eed07b3b429bfb73a381887306037955
+      md5: 8dfcebceb9c18ed5cf9f7d9cd9e4fd30
       size: 1493829
     - path: artifacts/used_config.json
       hash: md5
-      md5: 1fad0ccc31f04f051837ec9f8b63eb02
+      md5: 74c9c503125a8cf11ae04615022a3d16
       size: 827
   evaluate:
     cmd: python evaluate.py --config config/model_config.yaml --processed 
@@ -70,7 +70,7 @@ stages:
     deps:
     - path: artifacts/model_weights.pth
       hash: md5
-      md5: eed07b3b429bfb73a381887306037955
+      md5: 8dfcebceb9c18ed5cf9f7d9cd9e4fd30
       size: 1493829
     - path: data/processed/processed_data.npz
       hash: md5
@@ -87,13 +87,13 @@ stages:
     outs:
     - path: artifacts/eval/classification_report.json
       hash: md5
-      md5: 5068349481bbb3e4a499aa05667d7c2f
-      size: 621
+      md5: 7713b9e518c63c35fef411f200237cc0
+      size: 618
     - path: artifacts/eval/roc_curve.png
       hash: md5
       md5: f105d63ac6a064a96a6f7306144ea772
       size: 2398
     - path: artifacts/eval/test_metrics.json
       hash: md5
-      md5: 3f8769300b8583dc87041bca348ccca3
+      md5: eb8cbd38837f5a54671f40fc49ee3cfd
       size: 150
