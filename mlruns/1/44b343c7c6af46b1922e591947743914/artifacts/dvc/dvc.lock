@@ -1,0 +1,99 @@
+schema: '2.0'
+stages:
+  prepare:
+    cmd: python prepare.py --config config/model_config.yaml --output 
+      data/processed/processed_data.npz
+    deps:
+    - path: config/model_config.yaml
+      hash: md5
+      md5: 40f8232843d4aeff68df047da5b9fe3c
+      size: 653
+    - path: datasets
+      hash: md5
+      md5: 78e9c0b1477d9a7ab2014d55a35348bb.dir
+      size: 832954244
+      nfiles: 2
+    - path: prepare.py
+      hash: md5
+      md5: 144a94d1113f06b458eb7e63de72f0da
+      size: 1630
+    - path: src/data_loader.py
+      hash: md5
+      md5: 49a58ae92c3255d52064ea8ba2d8ef78
+      size: 9207
+    outs:
+    - path: data/processed/processed_data.npz
+      hash: md5
+      md5: 1558afb244beafbb997db5bfd6c2ef78
+      size: 1612353672
+  train:
+    cmd: python train.py --config config/model_config.yaml --processed 
+      data/processed/processed_data.npz --output-dir artifacts
+    deps:
+    - path: config/model_config.yaml
+      hash: md5
+      md5: 40f8232843d4aeff68df047da5b9fe3c
+      size: 653
+    - path: data/processed/processed_data.npz
+      hash: md5
+      md5: 1558afb244beafbb997db5bfd6c2ef78
+      size: 1612353672
+    - path: src/model.py
+      hash: md5
+      md5: adea8895b9548c6d5438e22279036371
+      size: 1500
+    - path: src/trainer.py
+      hash: md5
+      md5: a9b8426bec0b60b351dd85f3259409e0
+      size: 7324
+    - path: train.py
+      hash: md5
+      md5: 6ccf43ca24526baec594830ee066399e
+      size: 8610
+    outs:
+    - path: artifacts/best_model.pth
+      hash: md5
+      md5: d56f6cfb91891eda722558757056dfc1
+      size: 4452739
+    - path: artifacts/model_weights.pth
+      hash: md5
+      md5: 8dfcebceb9c18ed5cf9f7d9cd9e4fd30
+      size: 1493829
+    - path: artifacts/used_config.json
+      hash: md5
+      md5: 74c9c503125a8cf11ae04615022a3d16
+      size: 827
+  evaluate:
+    cmd: python evaluate.py --config config/model_config.yaml --processed 
+      data/processed/processed_data.npz --model-weights 
+      artifacts/model_weights.pth --output-dir artifacts/eval
+    deps:
+    - path: artifacts/model_weights.pth
+      hash: md5
+      md5: 8dfcebceb9c18ed5cf9f7d9cd9e4fd30
+      size: 1493829
+    - path: data/processed/processed_data.npz
+      hash: md5
+      md5: 1558afb244beafbb997db5bfd6c2ef78
+      size: 1612353672
+    - path: evaluate.py
+      hash: md5
+      md5: aa6b26dacb5b90e05c71cad0ee2c5ece
+      size: 4779
+    - path: src/validator.py
+      hash: md5
+      md5: 76c643c3aae4976f6e001a99e494e206
+      size: 6144
+    outs:
+    - path: artifacts/eval/classification_report.json
+      hash: md5
+      md5: 7713b9e518c63c35fef411f200237cc0
+      size: 618
+    - path: artifacts/eval/roc_curve.png
+      hash: md5
+      md5: f105d63ac6a064a96a6f7306144ea772
+      size: 2398
+    - path: artifacts/eval/test_metrics.json
+      hash: md5
+      md5: eb8cbd38837f5a54671f40fc49ee3cfd
+      size: 150

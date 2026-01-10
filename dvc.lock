@@ -48,8 +48,8 @@ stages:
       size: 7324
     - path: train.py
       hash: md5
-      md5: dfbf3c7061ff09808e6b5a646bffdeb1
-      size: 4997
+      md5: d67261720c6f57f37129f9782d60989b
+      size: 7288
     outs:
     - path: artifacts/best_model.pth
       hash: md5

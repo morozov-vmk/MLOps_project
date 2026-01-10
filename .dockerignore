@@ -1,0 +1,13 @@
+__pycache__
+*.pyc
+*.pyo
+*.pkl
+*.pt
+*.pth
+*.csv
+data/
+datasets/
+artifacts/
+.dvc/
+.git
+.env

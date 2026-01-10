@@ -149,7 +149,7 @@ pre-commit run --all-files
 
 ## Инструкции ниже для задания 2: ветка task2
 
-## Восстановление версии проекта
+Восстановление версии проекта
 
 ```bash
 git clone https://github.com/morozov-vmk/MLOps_project.git
@@ -158,4 +158,42 @@ git checkout v0.2
 dvc pull
 dvc repro
 ```
+
+Проверка переключения версий проекта
+
+```bash
+git checkout v0.1 && dvc pull
+git checkout v0.2 && dvc pull
+```
+
+Физически данные dvc хранятся в локальной папке (из-за общих по группе проблем подключения к удалённому хранилищу). [Содержимое папки](https://drive.google.com/file/d/1MpU2_ktFmbCbxzZlXfZW8Fz-1dkzWwql/view?usp=share_link). Были реализованы 3 этапа: prepare, train, evaluate. Параметры можно менять в файле `model_config.yaml`. План экпериментов подразумевается использование разных датасетов для обучения (с разными наборами признаков) и сравнение качества.
+
+Чтобы посмотреть результаты в MLFlow, нужно выполнить команду `mlflow ui` и открыть `http://127.0.0.1:5000`. Каждый эксперимент создаёт отдельный run с параметрами, метриками и артефактами.
+
+
+## Как собрать образ и запустить контейнер (инференс)
+
+### 1) Сборка Docker-образа
+```bash
+docker build -t ml-app:v1 .
+```
+### 2) Пример запуска (вход — processed_data.npz, который генерируется prepare.py)
+```bash
+# подготовьте processed .npz локально (если отсутствует):
+python scripts/prepare.py --config config/model_config.yaml --output data/processed/processed_data.npz
+
+# затем:
+docker run --rm \
+  -v "$(pwd)/artifacts:/app/artifacts:ro" \
+  -v "$(pwd)/data/processed/processed_data.npz:/app/processed.npz:ro" \
+  -v "$(pwd)/out:/app/out" \
+  ml-app:v1 --input_path /app/processed.npz --output_path /app/out/preds.csv --model_path /app/artifacts/model_weights.pth
+```
+### 3) Что делает скрипт predict:
+- Загружает конфиг --config (по умолчанию config/model_config.yaml, при отсутствии — работает без него).
+- Загружает веса модели (укажите --model_path или положите модель в artifacts/model_weights.pth или artifacts/best_model.pth).
+- Принимает --input_path (поддерживается .npz (ключ X_test), .csv, .parquet).
+- Делает предсказания (вероятности и бинарные метки с порогом 0.5).
+- Сохраняет `out/pred.csv` с колонками input_id (если был), index, probability, prediction.
+
 ---
