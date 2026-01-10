@@ -1,0 +1,42 @@
+stages:
+  prepare:
+    cmd: python scripts/prepare.py --config config/model_config.yaml --output 
+      data/processed/processed_data.npz
+    deps:
+    - config/model_config.yaml
+    - datasets
+    - prepare.py
+    - src/data_loader.py
+    outs:
+    - data/processed/processed_data.npz
+  train:
+    cmd: python scripts/train.py --config config/model_config.yaml --processed 
+      data/processed/processed_data.npz --output-dir artifacts
+    deps:
+    - config/model_config.yaml
+    - data/processed/processed_data.npz
+    - src/model.py
+    - src/trainer.py
+    - train.py
+    outs:
+    - artifacts/best_model.pth
+    - artifacts/model_weights.pth
+    - artifacts/used_config.json
+    metrics:
+    - artifacts/train_metrics.json:
+        cache: false
+  evaluate:
+    cmd: python scripts/evaluate.py --config config/model_config.yaml 
+      --processed data/processed/processed_data.npz --model-weights 
+      artifacts/model_weights.pth --output-dir artifacts/eval
+    deps:
+    - artifacts/model_weights.pth
+    - data/processed/processed_data.npz
+    - evaluate.py
+    - src/validator.py
+    outs:
+    - artifacts/eval/classification_report.json
+    - artifacts/eval/roc_curve.png
+    metrics:
+    - artifacts/eval/test_metrics.json:
+        cache: false
