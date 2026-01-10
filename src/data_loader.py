@@ -240,3 +240,11 @@ class DataProcessor:
         )
 
         return train_loader, val_loader, test_loader
+    
+    def create_test_loader(self, X_test, y_test):
+        dataset = CashbackDataset(X_test, y_test)
+        return DataLoader(
+            dataset,
+            batch_size=self.config["training"]["batch_size"],
+            shuffle=False,
+        )

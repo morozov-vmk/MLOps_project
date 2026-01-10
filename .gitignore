@@ -1,0 +1,6 @@
+/datasets
+/best_model.pth
+/model_weights.pth
+/training.log
+/validation_curves.png
+/artifacts

@@ -1,0 +1,4 @@
+[core]
+    remote = storage
+['remote "storage"']
+    url = /Users/i.d.morozov/desktop/dvc_storage
