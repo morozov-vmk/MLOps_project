@@ -171,29 +171,43 @@ git checkout v0.2 && dvc pull
 Чтобы посмотреть результаты в MLFlow, нужно выполнить команду `mlflow ui` и открыть `http://127.0.0.1:5000`. Каждый эксперимент создаёт отдельный run с параметрами, метриками и артефактами.
 
 
-## Как собрать образ и запустить контейнер (инференс)
+## Развёртывание через TorchServe
 
-### 1) Сборка Docker-образа
-```bash
-docker build -t ml-app:v1 .
-```
-### 2) Пример запуска (вход — processed_data.npz, который генерируется prepare.py)
-```bash
-# подготовьте processed .npz локально (если отсутствует):
-python scripts/prepare.py --config config/model_config.yaml --output data/processed/processed_data.npz
+1. Экспорт модели в torchscript:
+   ```bash
+   python scripts/export_torchscript.py --weights artifacts/model_weights.pth --out-dir model-store-prepare/mymodel --scaler artifacts/scaler.pkl
+    ```
 
-# затем:
-docker run --rm \
-  -v "$(pwd)/artifacts:/app/artifacts:ro" \
-  -v "$(pwd)/data/processed/processed_data.npz:/app/processed.npz:ro" \
-  -v "$(pwd)/out:/app/out" \
-  ml-app:v1 --input_path /app/processed.npz --output_path /app/out/preds.csv --model_path /app/artifacts/model_weights.pth
-```
-### 3) Что делает скрипт predict:
-- Загружает конфиг --config (по умолчанию config/model_config.yaml, при отсутствии — работает без него).
-- Загружает веса модели (укажите --model_path или положите модель в artifacts/model_weights.pth или artifacts/best_model.pth).
-- Принимает --input_path (поддерживается .npz (ключ X_test), .csv, .parquet).
-- Делает предсказания (вероятности и бинарные метки с порогом 0.5).
-- Сохраняет `out/pred.csv` с колонками input_id (если был), index, probability, prediction.
+2. Создать .mar:
+   ```bash
+   torch-model-archiver \
+    --model-name mymodel \
+    --version 1.0 \
+    --serialized-file model-store-prepare/mymodel/model.pt \
+    --handler torchserve_handler/handler.py \
+    --extra-files "model-store-prepare/mymodel/config.json,model-store-prepare/mymodel/scaler.pkl" \
+    --export-path model-store \
+    --force
+   ```
+  
+3. Сборка:
+  ```bash
+  docker build -t mymodel-serve:v1 .
+  ```
+
+4. Запуск:
+  ```bash
+  docker run -d -p 8080:8080 -p 8081:8081 --name mymodel-serve mymodel-serve:v1
+  ```
+
+5. Проверка:
+  ```bash
+  curl -X POST http://localhost:8080/predictions/mymodel -H "Content-Type: application/json" -d @sample_input.json
+  ```
+Форматы входных данных
+JSON array of arrays: [[f1,f2,...],[...]]
+Конфигурация
+Параметры TorchServe задаются в config.properties.
+Параметры модели доступны в config.json внутри model archive (handler подхватывает model.input_dim).
 
 ---

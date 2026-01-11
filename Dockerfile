@@ -1,16 +1,13 @@
-FROM python:3.10-slim
+FROM pytorch/torchserve:latest
 
-WORKDIR /app
+WORKDIR /home/model-server
 
-COPY requirements.txt /app/requirements.txt
+COPY model-store /home/model-server/model-store
 
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends gcc g++ build-essential && \
-    pip install --no-cache-dir -r /app/requirements.txt && \
-    apt-get remove -y gcc g++ build-essential && apt-get autoremove -y && rm -rf /var/lib/apt/lists/*
+COPY config.properties /home/model-server/config.properties
+COPY torchserve_handler /home/model-server/torchserve_handler
 
-COPY . /app
+EXPOSE 8080 8081
 
-ENV PYTHONUNBUFFERED=1
-
-ENTRYPOINT ["python", "-m", "src.predict"]
+ENTRYPOINT ["torchserve"]
+CMD ["--start", "--foreground", "--disable-token-auth", "--ts-config", "config.properties", "--model-store", "model-store", "--models", "mymodel=mymodel.mar"]
